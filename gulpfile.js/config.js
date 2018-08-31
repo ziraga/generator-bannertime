@@ -35,7 +35,8 @@ module.exports = {
     },
 
     'js': {
-      'src': src + '/**/js/banner.js',
+      'src': src + '/**/js/*.js',
+      'entry': src + '/**/js/banner.js',
       'dest': dest
     },
 
