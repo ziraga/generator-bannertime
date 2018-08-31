@@ -14,24 +14,30 @@ var uglify = require('gulp-uglify');
 
 var through2 =  require('through2');
 var browserify =  require('browserify');
+var filepath;
+var buffer;
+var returnStream;
 
 
 gulp.task('js', function() {
-  return gulp.src(config.tasks.js.src)
+  return gulp.src(config.tasks.js.entry)
     .pipe(through2.obj(function (file, enc, next){
-      browserify(file.path)
-        .bundle(function(err, res){
-          // assumes file.contents is a Buffer
-          file.contents = res;
-          next(null, file);
-        });
+      filepath = file;
+      buffer =  enc;
+      returnStream = next;
+
+      browserify({entries:[filepath.path]})
+        .bundle(function(err, streamData){
+          // console.log(err); // enable for troubleshooting
+          // console.log(streamData); // json with all data from file.
+          filepath.contents = streamData;
+          returnStream(null, file);
+        })
     }))
-    .pipe(changed(config.tasks.js.dest))
     .pipe(plumber({ errorHandler: handleErrors }))
-    .pipe(gulpif(process.env.NODE_ENV == 'production', jshint()))
-    .pipe(gulpif(process.env.NODE_ENV == 'production', jshint.reporter('default')))
-    .pipe(babel({presets: ['es2015']}))
-    .pipe(gulpif(process.env.NODE_ENV == 'production', uglify()))
+    .pipe(gulpif(process.env.NODE_ENV === 'production', jshint()))
+    .pipe(gulpif(process.env.NODE_ENV === 'production', jshint.reporter('default')))
+    .pipe(gulpif(process.env.NODE_ENV === 'production', uglify({ compress:{drop_console:true} })))
     .pipe(gulp.dest(config.tasks.js.dest))
     .pipe(browserSync.stream());
 });
