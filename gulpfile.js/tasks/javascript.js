@@ -12,15 +12,27 @@ var plumber = require('gulp-plumber');
 var removeCode = require('gulp-remove-code');
 var uglify = require('gulp-uglify');
 
+var through2 =  require('through2');
+var browserify =  require('browserify');
+
+
 gulp.task('js', function() {
   return gulp.src(config.tasks.js.src)
+    .pipe(through2.obj(function (file, enc, next){
+      browserify(file.path)
+        .bundle(function(err, res){
+          // assumes file.contents is a Buffer
+          file.contents = res;
+          next(null, file);
+        });
+    }))
     .pipe(changed(config.tasks.js.dest))
     .pipe(plumber({ errorHandler: handleErrors }))
     .pipe(gulpif(process.env.NODE_ENV == 'production', jshint()))
     .pipe(gulpif(process.env.NODE_ENV == 'production', jshint.reporter('default')))
     .pipe(babel({presets: ['es2015']}))
-    .pipe(removeCode({ production: process.env.NODE_ENV == 'production' }))
     .pipe(gulpif(process.env.NODE_ENV == 'production', uglify()))
     .pipe(gulp.dest(config.tasks.js.dest))
     .pipe(browserSync.stream());
 });
+
