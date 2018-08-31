@@ -1,8 +1,13 @@
-var app = app || {};
+var app = {};
+var animation = require('./animation');
 var banner;
-var dom = {};
-document.addEventListener('DOMContentLoaded', domContentReady);
-window.addEventListener('load', documentLoadComplete);
+
+init();
+
+function init() {
+  document.addEventListener('DOMContentLoaded', domContentReady);
+  window.addEventListener('load', documentLoadComplete);
+}
 
 function domContentReady() {
   console.log('DOM Content Ready');
@@ -22,13 +27,7 @@ function getElements() {
 
 function documentLoadComplete() {
   console.log('All Resources Loaded');
-  app.animation.init();
-}
-
-function removeElement(elementId) {
-  var element = document.getElementById(elementId);
-  element.parentNode.removeChild(element);
-  console.log(elementId, "removed");
+  animation.init();
 }
 
 function addListeners(){

@@ -1,12 +1,12 @@
+var test =  require('./utils');
 
 var timeline;
-
-app.animation = (function () {
+var animation = (function () {
 
   function init() {
     timeline = new TimelineMax();
     masterTimeline();
-    removeElement('preloader')
+    test.removeElement('preloader');
   }
 
   function masterTimeline(){
@@ -24,3 +24,5 @@ app.animation = (function () {
     init:init
   }
 })();
+
+module.exports = animation;
